@@ -1,5 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.views.generic import CreateView
+
 from .models import Post
+from .forms import PostForm
 
 
 # Create your views here.
@@ -22,3 +25,15 @@ def post_detail(request, id):
         'post': post,
     }
     return render(request, 'blog/post_detail.html', context)
+
+
+def post_create(request):
+    form = PostForm(data=request.POST)
+    if form.is_valid():
+        newdoc = form.save(commit=False)
+        newdoc.author = request.user
+        newdoc.save()
+        return redirect('blog-home')
+    return render(request, 'blog/post_form.html', {'form': form})
+
+
